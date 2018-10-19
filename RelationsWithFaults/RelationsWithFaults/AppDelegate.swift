@@ -28,7 +28,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
         self.window!.makeKeyAndVisible()
         
-        createOneToOneRelation()
+        //createOneToOneRelation()
+        
+        //createOneToManyRelation()
         return true
     }
 
@@ -52,7 +54,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         saveContext()
     }
     
-    
+    func createOneToManyRelation()
+    {
+        let context = persistentContainer.viewContext
+        
+        //fetch request
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>.init(entityName: "Person")
+        fetchRequest.predicate = NSPredicate.init(format: "age = 23")
+        
+        do {
+            let persons = try context.fetch(fetchRequest)
+            
+            let fetchedPerson : Person = persons.last as! Person
+            
+            let friend1 = Friends(context: context)
+            friend1.name = "Varun"
+            friend1.knownSince = 1996
+            
+            fetchedPerson.addToFriends(friend1)
+            
+            let friend2 = Friends(context: context)
+            friend2.name = "Heena"
+            friend2.knownSince = 1999
+            
+            fetchedPerson.addToFriends(friend2)
+            
+            do{
+                try context.save()
+            }
+            catch let error as NSError{
+                print("Unable to update data due to \(error.userInfo)")
+            }
+            
+        } catch let error as NSError{
+            print("Unable to fetch data due to \(error.userInfo)")
+        }
+        
+    }
     
     // MARK: - Core Data stack
 
